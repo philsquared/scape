@@ -68,6 +68,9 @@ namespace scape {
         auto left( std::ostream& os ) -> std::ostream&;
         auto right( std::ostream& os ) -> std::ostream&;
 
+        auto hide_cursor( std::ostream& os ) -> std::ostream&;
+        auto show_cursor( std::ostream& os ) -> std::ostream&;
+
         auto save_cursor( std::ostream& os ) -> std::ostream&;
         auto restore_cursor( std::ostream& os ) -> std::ostream&;
     }
@@ -83,13 +86,15 @@ namespace scape {
         struct size{
             enum source{ guessed, queried };
             source source;
-            int x, y;
+            int width, height;
         };
         auto dimensions() -> size;
     }
 
     auto underline( std::ostream& os ) -> std::ostream&;
     auto no_underline( std::ostream& os ) -> std::ostream&;
+
+    auto flush( std::ostream& os ) -> std::ostream&;
 
     // Reset all text attributes
     auto reset( std::ostream& os ) -> std::ostream&;

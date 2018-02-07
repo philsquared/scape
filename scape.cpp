@@ -109,6 +109,9 @@ namespace scape {
         auto left( std::ostream& os ) -> std::ostream& { return os << detail::esc_prefix << "1D"; }
         auto right( std::ostream& os ) -> std::ostream& { return os << detail::esc_prefix << "1C"; }
 
+        auto hide_cursor( std::ostream& os ) -> std::ostream& { return os << "\e[?25l"; }
+        auto show_cursor( std::ostream& os ) -> std::ostream& { return os << "\e[?25h"; }
+
         auto save_cursor( std::ostream& os ) -> std::ostream& { return os << "\e7"; }
         auto restore_cursor( std::ostream& os ) -> std::ostream& { return os << "\e8"; }
     }
@@ -166,6 +169,7 @@ namespace scape {
 
     }
 
+    auto flush( std::ostream& os ) -> std::ostream& { os.flush(); return os; }
     auto underline( std::ostream& os ) -> std::ostream&{ return os << detail::esc_prefix << ";4m"; }
     auto no_underline( std::ostream& os ) -> std::ostream&{ return os << detail::esc_prefix << ";24m"; }
     auto reset( std::ostream& os ) -> std::ostream& { return os << detail::esc_prefix << ";0m"; }
