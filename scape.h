@@ -2,7 +2,6 @@
 #define SCAPE_H_INCLUDED
 
 #include <iosfwd>
-#include <memory>
 
 // This is going to be stitched into a single header library, along the lines of Catch2
 namespace scape {

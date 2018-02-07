@@ -57,10 +57,11 @@ void test_cursors() {
 
 int main() {
 
+//    std::cout << screen::save;
+
     test_colours();
     //test_cursors();
 
-//    std::cout << move_to{ 10, 1 } << "hi there!";
 //    std::cout << screen::restore;
     return 0;
 }
