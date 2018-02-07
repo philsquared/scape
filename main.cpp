@@ -62,20 +62,30 @@ void test_cursors() {
     std::cout << screen::restore;
 }
 
-int main() {
+int main( int argc, char* argv[] ) {
 
-    using namespace scape;
-    auto size = screen::dimensions();
-    std::cout << "terminal size: " << size.width << "x" << size.height;
+    std::string cmd;
+    if( argc == 2 )
+        cmd = argv[1];
 
-    if( size.source == screen::size::queried )
-        std::cout << " (queried)";
-    else
-        std::cout << " (guessed)";
-    std::cout << "\n\n";
+    if( cmd == "cursors" ) {
+        test_cursors();
+    }
+    else if( cmd == "colours" ) {
+        using namespace scape;
+        auto size = screen::dimensions();
+        std::cout << "terminal size: " << size.width << "x" << size.height;
 
-    test_colours();
-    //test_cursors();
+        if( size.source == screen::size::queried )
+            std::cout << " (queried)";
+        else
+            std::cout << " (guessed)";
+        std::cout << "\n\n";
 
-    return 0;
+        test_colours();
+    }
+    else {
+        std::cout << "\npass colours or cursors to run specific tests\n\n";
+        return 1;
+    }
 }
