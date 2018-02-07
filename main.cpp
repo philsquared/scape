@@ -66,7 +66,7 @@ int main() {
 
     using namespace scape;
     auto size = screen::dimensions();
-    std::cout << "terminal size: " << size.x << "x" << size.y;
+    std::cout << "terminal size: " << size.width << "x" << size.height;
 
     if( size.source == screen::size::queried )
         std::cout << " (queried)";
