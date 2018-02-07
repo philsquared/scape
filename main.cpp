@@ -48,7 +48,7 @@ void test_colours() {
 
 void test_cursors() {
     using namespace scape;
-    std::cout << screen::clear << screen::home;
+    std::cout << screen::clear;
 
     std::cout << move_to{ 10, 5 } << "hi there!";
     std::cout << move_to{ 0, 7 } << std::endl;

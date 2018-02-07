@@ -126,11 +126,11 @@ namespace scape {
     }
 
     namespace screen {
-        auto clear ( std::ostream& os ) -> std::ostream& {
-            return os << detail::esc_prefix << "2J";
-        }
         auto home ( std::ostream& os ) -> std::ostream& {
             return os << detail::esc_prefix << "H";
+        }
+        auto clear ( std::ostream& os ) -> std::ostream& {
+            return os << detail::esc_prefix << "2J" << home;
         }
 
         // ** save/ restore don't seem to work

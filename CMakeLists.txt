@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
-project(CursesTest)
+project(ScapeTest)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(CursesTest main.cpp scape.cpp scape.h)
+add_executable(ScapeTest main.cpp scape.cpp scape.h)
