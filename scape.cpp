@@ -4,7 +4,7 @@
 
 // For screen size
 #include <sys/ioctl.h>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 
 // !TBD ANSI terminals only, for now
@@ -13,8 +13,6 @@ namespace scape {
     namespace detail {
 
         namespace {
-            const std::string esc_prefix = "\e[";
-
             inline auto fg_colour( foreground_colours col ) -> char const* {
                 switch( col ) {
                     case foreground_colours::black: return "0;30";
@@ -59,21 +57,21 @@ namespace scape {
             auto fg = fg_colour( col.foreground );
             auto bg = bg_colour( col.background );
             if( fg && bg )
-                return os << esc_prefix << fg << ";" << bg << "m";
+                return os << "\e[" << fg << ";" << bg << "m";
             else if( fg )
-                return os << esc_prefix << fg << "m";
+                return os << "\e[" << fg << "m";
             else if( bg )
-                return os << esc_prefix << "0;" << bg << "m";
+                return os << "\e[0;" << bg << "m";
             return os;
         }
 
         auto operator << ( std::ostream& os, fg_manip const& col ) -> std::ostream& {
             if( auto fg = fg_colour( col.foreground ) )
-                return os << esc_prefix << fg << "m";
+                return os << "\e[" << fg << "m";
             return os;
         }
 
-        fg_manip::fg_manip( foreground_colours fg )
+        fg_manip::fg_manip( foreground_colours fg ) noexcept
         :   foreground( fg ),
             on_black( fg, background_colours::on_black ),
             on_red( fg, background_colours::on_red ),
@@ -89,25 +87,25 @@ namespace scape {
     namespace cursor {
 
         auto operator << ( std::ostream& os, move_to const& coords ) -> std::ostream& {
-            return os << detail::esc_prefix << coords.y << ";" << coords.x << "H";
+            return os << "\e[" << coords.y << ";" << coords.x << "H";
         }
         auto operator << ( std::ostream& os, up_by const& by ) -> std::ostream& {
-            return os << detail::esc_prefix << by.amount << "A";
+            return os << "\e[" << by.amount << "A";
         }
         auto operator << ( std::ostream& os, down_by const& by ) -> std::ostream& {
-            return os << detail::esc_prefix << by.amount << "B";
+            return os << "\e[" << by.amount << "B";
         }
         auto operator << ( std::ostream& os, left_by const& by ) -> std::ostream& {
-            return os << detail::esc_prefix << by.amount << "D";
+            return os << "\e[" << by.amount << "D";
         }
         auto operator << ( std::ostream& os, right_by const& by ) -> std::ostream& {
-            return os << detail::esc_prefix << by.amount << "C";
+            return os << "\e[" << by.amount << "C";
         }
 
-        auto up( std::ostream& os ) -> std::ostream& { return os << detail::esc_prefix << "1A"; }
-        auto down( std::ostream& os ) -> std::ostream& { return os << detail::esc_prefix << "1B"; }
-        auto left( std::ostream& os ) -> std::ostream& { return os << detail::esc_prefix << "1D"; }
-        auto right( std::ostream& os ) -> std::ostream& { return os << detail::esc_prefix << "1C"; }
+        auto up( std::ostream& os ) -> std::ostream& { return os << "\e[1A"; }
+        auto down( std::ostream& os ) -> std::ostream& { return os << "\e[1B"; }
+        auto left( std::ostream& os ) -> std::ostream& { return os << "\e[1D"; }
+        auto right( std::ostream& os ) -> std::ostream& { return os << "\e[1C"; }
 
         auto hide_cursor( std::ostream& os ) -> std::ostream& { return os << "\e[?25l"; }
         auto show_cursor( std::ostream& os ) -> std::ostream& { return os << "\e[?25h"; }
@@ -137,43 +135,32 @@ namespace scape {
     }
 
     namespace screen {
-        auto home ( std::ostream& os ) -> std::ostream& {
-            return os << detail::esc_prefix << "H";
-        }
-        auto clear ( std::ostream& os ) -> std::ostream& {
-            return os << detail::esc_prefix << "2J" << home;
-        }
-
-        auto save ( std::ostream& os ) -> std::ostream& {
-            return os << "\e[?47h";
-        }
-        auto restore ( std::ostream& os ) -> std::ostream& {
-            return os << "\e[?47l";
-        }
+        auto home ( std::ostream& os ) -> std::ostream& { return os << "\e[H"; }
+        auto clear ( std::ostream& os ) -> std::ostream& { return os << "\e[2J" << home; }
+        auto save ( std::ostream& os ) -> std::ostream& { return os << "\e[?47h"; }
+        auto restore ( std::ostream& os ) -> std::ostream& { return os << "\e[?47l"; }
 
         auto dimensions() -> size {
-        #ifdef TIOCGSIZE
+#ifdef TIOCGSIZE
             struct ttysize ts;
             ioctl( STDIN_FILENO, TIOCGSIZE, &ts );
             if( ts.ts_cols > 0 && ts.ts_lines > 0 )
                 return { size::queried, ts.ts_cols, ts.ts_lines };
-        #elif defined(TIOCGWINSZ)
+#elif defined( TIOCGWINSZ )
             struct winsize ts;
             ioctl( STDIN_FILENO, TIOCGWINSZ, &ts );
             if( ts.ws_col > 0 && ts.ws_row > 0 )
                 return { size::queried, ts.ws_col, ts.ws_row };
-        #endif /* TIOCGSIZE */
+#endif // TIOCGSIZE
 
-        return { size::guessed, 80, 24 }; // !TBD
+            return { size::guessed, 80, 24 }; // !TBD
         }
-
-    }
+    } // namespace screen
 
     auto flush( std::ostream& os ) -> std::ostream& { os.flush(); return os; }
-    auto underline( std::ostream& os ) -> std::ostream&{ return os << detail::esc_prefix << ";4m"; }
-    auto no_underline( std::ostream& os ) -> std::ostream&{ return os << detail::esc_prefix << ";24m"; }
-    auto reset( std::ostream& os ) -> std::ostream& { return os << detail::esc_prefix << ";0m"; }
+    auto underline( std::ostream& os ) -> std::ostream&{ return os << "\e[;4m"; }
+    auto no_underline( std::ostream& os ) -> std::ostream&{ return os << "\e[;24m"; }
+    auto reset( std::ostream& os ) -> std::ostream& { return os << "\e[;0m"; }
     auto endl ( std::ostream& os ) -> std::ostream& { return os << reset << std::endl; }
-
 
 } // namespace scape

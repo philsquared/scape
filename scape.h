@@ -21,14 +21,14 @@ namespace scape {
             foreground_colours foreground;
             background_colours background;
         public:
-            bg_manip( foreground_colours fg, background_colours bg ) : foreground( fg ), background( bg ) {}
+            bg_manip( foreground_colours fg, background_colours bg ) noexcept : foreground( fg ), background( bg ) {}
             friend auto operator << ( std::ostream& os, bg_manip const& col ) -> std::ostream&;
         };
 
         class fg_manip {
             foreground_colours foreground;
         public:
-            fg_manip( foreground_colours fg );
+            fg_manip( foreground_colours fg ) noexcept;
             bg_manip on_black, on_red, on_green, on_yellow, on_blue, on_magenta, on_cyan, on_grey;
             friend auto operator << ( std::ostream& os, fg_manip const& col ) -> std::ostream&;
         };
