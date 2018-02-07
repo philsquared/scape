@@ -2,6 +2,11 @@
 
 #include <ostream>
 
+// For screen size
+#include <sys/ioctl.h>
+#include <stdio.h>
+#include <unistd.h>
+
 // !TBD ANSI terminals only, for now
 namespace scape {
 
@@ -103,6 +108,9 @@ namespace scape {
         auto down( std::ostream& os ) -> std::ostream& { return os << detail::esc_prefix << "1B"; }
         auto left( std::ostream& os ) -> std::ostream& { return os << detail::esc_prefix << "1D"; }
         auto right( std::ostream& os ) -> std::ostream& { return os << detail::esc_prefix << "1C"; }
+
+        auto save_cursor( std::ostream& os ) -> std::ostream& { return os << "\e7"; }
+        auto restore_cursor( std::ostream& os ) -> std::ostream& { return os << "\e8"; }
     }
 
     namespace colours {
@@ -133,13 +141,29 @@ namespace scape {
             return os << detail::esc_prefix << "2J" << home;
         }
 
-        // ** save/ restore don't seem to work
-//        auto save ( std::ostream& os ) -> std::ostream& {
-//            return os << detail::esc_prefix << "s"; // !TBD "47h" (save screen) doesn't seem to work? - neither does s for restore cursor
-//        }
-//        auto restor ( std::ostream& os ) -> std::ostream& {
-//            return os << detail::esc_prefix << "u"; // 47l
-//        }
+        auto save ( std::ostream& os ) -> std::ostream& {
+            return os << "\e[?47h";
+        }
+        auto restore ( std::ostream& os ) -> std::ostream& {
+            return os << "\e[?47l";
+        }
+
+        auto dimensions() -> size {
+        #ifdef TIOCGSIZE
+            struct ttysize ts;
+            ioctl( STDIN_FILENO, TIOCGSIZE, &ts );
+            if( ts.ts_cols > 0 && ts.ts_lines > 0 )
+                return { size::queried, ts.ts_cols, ts.ts_lines };
+        #elif defined(TIOCGWINSZ)
+            struct winsize ts;
+            ioctl( STDIN_FILENO, TIOCGWINSZ, &ts );
+            if( ts.ws_col > 0 && ts.ws_row > 0 )
+                return { size::queried, ts.ws_col, ts.ws_row };
+        #endif /* TIOCGSIZE */
+
+        return { size::guessed, 80, 24 }; // !TBD
+        }
+
     }
 
     auto underline( std::ostream& os ) -> std::ostream&{ return os << detail::esc_prefix << ";4m"; }

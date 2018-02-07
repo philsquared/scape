@@ -48,20 +48,34 @@ void test_colours() {
 
 void test_cursors() {
     using namespace scape;
+    std::cout << screen::save;
+
     std::cout << screen::clear;
 
     std::cout << move_to{ 10, 5 } << "hi there!";
     std::cout << move_to{ 0, 7 } << std::endl;
 
+    std::cout << "press enter to continue..." << std::endl;
+
+    getchar();
+
+    std::cout << screen::restore;
 }
 
 int main() {
 
-//    std::cout << screen::save;
+    using namespace scape;
+    auto size = screen::dimensions();
+    std::cout << "terminal size: " << size.x << "x" << size.y;
+
+    if( size.source == screen::size::queried )
+        std::cout << " (queried)";
+    else
+        std::cout << " (guessed)";
+    std::cout << "\n\n";
 
     test_colours();
     //test_cursors();
 
-//    std::cout << screen::restore;
     return 0;
 }

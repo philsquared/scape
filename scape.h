@@ -67,6 +67,9 @@ namespace scape {
         auto down( std::ostream& os ) -> std::ostream&;
         auto left( std::ostream& os ) -> std::ostream&;
         auto right( std::ostream& os ) -> std::ostream&;
+
+        auto save_cursor( std::ostream& os ) -> std::ostream&;
+        auto restore_cursor( std::ostream& os ) -> std::ostream&;
     }
 
     // !TBD move this into a separate header?
@@ -74,9 +77,15 @@ namespace scape {
         auto clear ( std::ostream& os ) -> std::ostream&;
         auto home ( std::ostream& os ) -> std::ostream&;
 
-        // not working
-//        auto save ( std::ostream& os ) -> std::ostream&;
-//        auto restore ( std::ostream& os ) -> std::ostream&;
+        auto save ( std::ostream& os ) -> std::ostream&;
+        auto restore ( std::ostream& os ) -> std::ostream&;
+
+        struct size{
+            enum source{ guessed, queried };
+            source source;
+            int x, y;
+        };
+        auto dimensions() -> size;
     }
 
     auto underline( std::ostream& os ) -> std::ostream&;
