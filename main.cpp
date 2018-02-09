@@ -43,22 +43,32 @@ void test_colours() {
         << "\nstyles:\n  "
         << underline << "underlined"
         << no_underline << " not underlined"
-        << scape::endl;
+        << "\n"
+        << flush; // flushes the underlying stream
 }
 
 void test_cursors() {
     using namespace scape;
     std::cout << screen::save;
+    std::cout << save_cursor << hide_cursor;
 
     std::cout << screen::clear;
 
     std::cout << move_to{ 10, 5 } << "hi there!";
-    std::cout << move_to{ 0, 7 } << std::endl;
 
+    std::cout
+        << blue
+        << up << left_by{10} << "***********"
+        << down << left << "*"
+        << down << left_by{11} << "***********"
+        << left_by{12} << up_by{1} << right << "*";
+
+    std::cout << down_by{ 4 } << right_by{3} << reset_colour;
     std::cout << "press enter to continue..." << std::endl;
 
     getchar();
 
+    std::cout << show_cursor << restore_cursor;
     std::cout << screen::restore;
 }
 
